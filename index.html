@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account & Time Manager</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 16px;
+    color: #e5e7eb;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 720px;
+    background: rgba(17, 24, 39, 0.75);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+    background: linear-gradient(90deg, #a78bfa, #22d3ee);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .subtitle { font-size: 0.85rem; color: #9ca3af; margin-bottom: 22px; }
+
+  /* ---- Form ---- */
+  .form-group {
+    display: grid;
+    grid-template-columns: 1fr 170px auto;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  input {
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    background: rgba(31, 41, 55, 0.8);
+    color: #f3f4f6;
+    font-size: 0.95rem;
+    outline: none;
+    transition: 0.2s;
+    width: 100%;
+  }
+
+  input:focus { border-color: #a78bfa; box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2); }
+  input::placeholder { color: #6b7280; }
+
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+
+  .btn-add {
+    padding: 12px 22px;
+    background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+    color: #fff;
+    white-space: nowrap;
+  }
+  .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.45); }
+  .btn-add:active { transform: translateY(0); }
+
+  /* ---- Table ---- */
+  .table-wrap { border-radius: 12px; overflow: hidden; border: 1px solid rgba(139, 92, 246, 0.25); }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead {
+    background: rgba(139, 92, 246, 0.18);
+  }
+  th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #c4b5fd;
+  }
+
+  td { padding: 14px 16px; font-size: 0.95rem; border-top: 1px solid rgba(255,255,255,0.06); }
+
+  tbody tr { transition: 0.15s; }
+  tbody tr:hover { background: rgba(139, 92, 246, 0.08); }
+
+  .name-cell { font-weight: 600; color: #f9fafb; }
+
+  .time-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(34, 211, 238, 0.15);
+    color: #67e8f9;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border: 1px solid rgba(34, 211, 238, 0.35);
+  }
+
+  .btn-del {
+    padding: 7px 14px;
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    font-size: 0.82rem;
+  }
+  .btn-del:hover { background: rgba(239, 68, 68, 0.3); color: #fff; }
+
+  .empty {
+    text-align: center;
+    padding: 36px 16px;
+    color: #6b7280;
+    font-size: 0.9rem;
+  }
+
+  .footer-info {
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #9ca3af;
+  }
+
+  @media (max-width: 560px) {
+    .form-group { grid-template-columns: 1fr; }
+    th:nth-child(3), td:nth-child(3) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Account &amp; Time</h1>
+  <p class="subtitle">Tambahkan nama account beserta waktunya.</p>
+
+  <div class="form-group">
+    <input type="text" id="nameInput" placeholder="Nama account..." maxlength="40">
+    <input type="time" id="timeInput">
+    <button class="btn-add" onclick="addAccount()">+ Tambah</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Waktu</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr><td colspan="3" class="empty">Belum ada data. Tambahkan account pertama kamu 👆</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-info">
+    <span>Total: <b id="totalCount">0</b> account</span>
+    <span id="clock"></span>
+  </div>
+</div>
+
+<script>
+  const nameInput = document.getElementById('nameInput');
+  const timeInput = document.getElementById('timeInput');
+  const tableBody = document.getElementById('tableBody');
+  const totalCount = document.getElementById('totalCount');
+
+  let accounts = JSON.parse(localStorage.getItem('accountsTime')) || [];
+
+  function save() {
+    localStorage.setItem('accountsTime', JSON.stringify(accounts));
+  }
+
+  function render() {
+    if (accounts.length === 0) {
+      tableBody.innerHTML =
+        '<tr><td colspan="3" class="empty">Belum ada data. Tambahkan account pertama kamu 👆</td></tr>';
+      totalCount.textContent = 0;
+      return;
+    }
+
+    tableBody.innerHTML = accounts.map((acc, i) => `
+      <tr>
+        <td class="name-cell">${escapeHtml(acc.name)}</td>
+        <td><span class="time-badge">${acc.time || '--:--'}</span></td>
+        <td><button class="btn-del" onclick="deleteAccount(${i})">Hapus</button></td>
+      </tr>
+    `).join('');
+
+    totalCount.textContent = accounts.length;
+  }
+
+  function addAccount() {
+    const name = nameInput.value.trim();
+    const time = timeInput.value;
+
+    if (!name) {
+      alert('Nama account tidak boleh kosong!');
+      nameInput.focus();
+      return;
+    }
+
+    accounts.push({ name, time: time || '' });
+    save();
+    render();
+
+    nameInput.value = '';
+    timeInput.value = '';
+    nameInput.focus();
+  }
+
+  function deleteAccount(index) {
+    if (confirm('Hapus account "' + accounts[index].name + '"?')) {
+      accounts.splice(index, 1);
+      save();
+      render();
+    }
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  // Enter untuk submit
+  nameInput.addEventListener('keypress', e => { if (e.key === 'Enter') addAccount(); });
+  timeInput.addEventListener('keypress', e => { if (e.key === 'Enter') addAccount(); });
+
+  // Jam berjalan
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      now.toLocaleTimeString('id-ID', { hour12: false });
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  render();
+</script>
+
+</body>
+</html>
